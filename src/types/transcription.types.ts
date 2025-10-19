@@ -5,3 +5,10 @@ export interface TranscriptionRequest {
 export interface TranscriptionResponse {
   id: string;
 }
+
+export interface TranscriptionRecord {
+  audioUrl: string;
+  transcription: string;
+  source?: string;
+  createdAt: Date;
+}

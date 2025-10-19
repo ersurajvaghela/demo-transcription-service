@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { transcribeAudio } from "../services/transcription.service";
-import { TranscriptionRequest, TranscriptionResponse } from "../types/transcription.types";
+import { TranscriptionRequest, TranscriptionResponse, TranscriptionRecord } from "../types/transcription.types";
 import { Transcription } from "../models/transcription.model";
 
 export const createTranscription = async (
@@ -21,10 +21,9 @@ export const createTranscription = async (
   }
 };
 
-
 export const getRecentTranscriptions = async (
   req: Request,
-  res: Response
+  res: Response<{ transcriptions: TranscriptionRecord[] } | { error: string }>
 ) => {
   try {
     const thirtyDaysAgo = new Date();
@@ -35,7 +34,15 @@ export const getRecentTranscriptions = async (
     }).sort({ createdAt: -1 }); // newest first
 
     console.log(`Fetched ${records.length} recent transcriptions`);
-    res.status(200).json(records);
+    res.status(200).json({
+      transcriptions: records.map(record => ({
+        id: (record as any)._id.toString(),
+        audioUrl: record.audioUrl,
+        transcription: record.transcription,
+        source: record.source,
+        createdAt: record.createdAt,
+      }))
+    });
 
   } catch (error: any) {
     console.error("Error fetching recent transcriptions:", error.message);
@@ -46,7 +53,7 @@ export const getRecentTranscriptions = async (
 
 export const azureTranscription = async (
   req: Request<{}, {}, TranscriptionRequest>,
-  res: Response
+  res: Response<TranscriptionResponse | { error: string }>
 ) => {
   try {
     const { audioUrl } = req.body;
