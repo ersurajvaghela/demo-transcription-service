@@ -89,7 +89,7 @@ RETRY_COUNT=3
 
 ```json
 {
-  "id": "670f5c3d4a8fbcf2b45d1234"
+  "id": "68f4752cdb810b07a8c445ec"
 }
 ```
 
@@ -109,7 +109,7 @@ RETRY_COUNT=3
 ```json
 [
   {
-    "_id": "670f5c3d4a8fbcf2b45d1234",
+    "_id": "68f4752cdb810b07a8c445ec",
     "audioUrl": "https://example.com/sample.mp3",
     "transcription": "transcribed text",
     "createdAt": "2025-10-01T10:00:00.000Z"
@@ -120,6 +120,34 @@ RETRY_COUNT=3
 **Behavior:**
 
 * Returns transcriptions created in the last **30 days**, newest first
+---
+
+### POST `/api/azure-transcription`
+
+**Request Body:**
+
+```json
+{
+  "audioUrl": "https://example.com/sample.mp3"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "68f478867767b6cc71f45d04"
+}
+```
+
+**Behavior:**
+
+* Mock downloads audio from URL
+* Mocks transcription as "transcribed text"
+* localpath
+
+* Stores `{ audioUrl, transcription, source, createdAt }` in MongoDB
+* Returns MongoDB `_id`
 
 ---
 
@@ -156,7 +184,7 @@ To handle **10k+ concurrent requests**:
 
 1. **Load Balancing & Containerization**
 
-   * Deploy in Docker containers behind a load balancer (e.g., Nginx, AWS ELB)
+   * Deploy in Docker containers behind a load balancer
    * Use autoscaling to handle traffic spikes
 
 2. **Asynchronous Processing with Queues**
