@@ -2,7 +2,7 @@ import axios from "axios";
 import { Transcription } from "../models/transcription.model";
 import { withRetry } from "../utils/retry";
 
-export const transcribeAudio = async (audioUrl: string) => {
+export const transcribeAudio = async (audioUrl: string, source: string) => {
   // Mock download with retry
   await withRetry(async () => {
     console.log(`Downloading audio from: ${audioUrl}`);
@@ -13,12 +13,22 @@ export const transcribeAudio = async (audioUrl: string) => {
   // Mock transcription
   const transcription = "transcribed text";
 
-  // Save record
-  const record = await Transcription.create({
+  const recordData: any = {
     audioUrl,
     transcription,
     createdAt: new Date(),
-  });
+  };
+
+  // Only add `source` if it exists
+  if (source) {
+    recordData.source = source;
+  }
+
+  console.log(`Transcription source: ${source || "default"}`);
+  console.log(`Transcription completed for: ${JSON.stringify(recordData)}`);
+
+
+  const record = await Transcription.create(recordData);
 
   return record;
 };
